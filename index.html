@@ -2,240 +2,271 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3H Radio - Lecteur Web Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>RADIO 95 – Live</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="icon-192.png">
 
 <style>
-body {
-    margin: 0;
-    height: 100vh;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    overflow: hidden;
-    background: #000;
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ================= BODY ================= */
+body{
+    font-family:'Segoe UI',Arial,sans-serif;
+    height:100vh;
+    overflow:hidden;
+    color:#fff;
+    background:url("https://radio3h.neocities.org/turkey-logo-black-and-white.png") center/cover no-repeat;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:-2;
 }
 
-#bgCanvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
+/* ================= BANNIERES ================= */
+.banner{
+    position:fixed;
+    left:0;
+    width:100%;
+    height:38px;
+    overflow:hidden;
+    background:rgba(0,0,0,.7);
+    backdrop-filter:blur(10px);
+    z-index:20;
+}
+.banner.top{top:0}
+.banner.bottom{bottom:0}
+
+.banner span{
+    white-space:nowrap;
+    display:inline-block;
+    padding-left:100%;
+    animation:scroll 15s linear infinite;
+    line-height:38px;
+    font-size:14px;
+    letter-spacing:1px;
+}
+@keyframes scroll{
+    from{transform:translateX(0)}
+    to{transform:translateX(-100%)}
 }
 
-/* Lecteur */
-.radio-card {
-    width: 380px;
-    background: linear-gradient(180deg, rgba(17,17,17,0.95), rgba(10,10,10,0.95));
-    border-radius: 26px;
-    padding: 28px;
-    box-shadow: 0 30px 80px rgba(0,0,0,.95);
-    text-align: center;
+/* ================= CANVAS ================= */
+#particlesCanvas{
+    position:fixed;
+    inset:0;
+    z-index:-1;
 }
 
-/* Titre défilant */
-.radio-title {
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    overflow: hidden;
-    white-space: nowrap;
-    width: 100%;
-    margin-bottom: 6px;
+/* ================= CARD ================= */
+.radio-card{
+    width:360px;
+    max-width:92%;
+    padding:22px;
+    border-radius:24px;
+    background:rgba(20,20,20,.18);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.12);
+    text-align:center;
+    box-shadow:0 0 40px rgba(0,255,255,.25),0 0 25px rgba(255,0,255,.25);
 }
 
-.marquee {
-    display: inline-block;
-    padding-left: 100%;
-    animation: scrollText 10s linear infinite;
+/* ================= VISUAL ================= */
+.visual{margin:16px 0}
+.visual img{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    transition:.1s;
 }
 
-@keyframes scrollText {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
+/* ================= CONTROLS ================= */
+button{
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    border-radius:40px;
+    border:1px solid rgba(255,255,255,.2);
+    background:rgba(0,0,0,.65);
+    color:#fff;
+    font-size:14px;
+    letter-spacing:1px;
+    cursor:pointer;
+}
+button:hover{transform:scale(1.04)}
+
+.led{
+    width:9px;height:9px;
+    border-radius:50%;
+    background:gray;
+    display:inline-block;
+    margin-left:6px;
+}
+.led.playing{
+    background:#0f0;
+    box-shadow:0 0 6px #0f0;
 }
 
-#status {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 16px;
+/* ================= FOOTER ================= */
+.card-footer{
+    margin-top:14px;
+    font-size:11px;
+    letter-spacing:1px;
+    opacity:.75;
 }
 
-/* Visual animé */
-.visual {
-    margin: 16px 0 22px;
-    height: 160px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #222, #000);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 52px;
-    color: #fff;
-    animation: pulse 2s infinite;
-}
+/* ================= MOBILE ================= */
+@media(max-width:600px){
+    body{
+        padding:38px 0;
+        align-items:center;
+    }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.05); opacity: 1; }
-}
+    .radio-card{
+        width:90%;
+        max-width:300px;
+        padding:14px;
+        border-radius:18px;
+    }
 
-/* Boutons */
-.controls {
-    margin-top: 16px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    align-items: center;
-}
+    .radio-card h2{
+        font-size:15px;
+    }
 
-button {
-    position: relative;
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 12px 26px;
-    border-radius: 40px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: 0.3s;
-}
+    .visual img{
+        width:75px;
+        height:75px;
+    }
 
-button:hover {
-    background: #1e1e1e;
-    transform: scale(1.05);
-}
+    button{
+        font-size:13px;
+        padding:9px;
+    }
 
-/* LED pulsante */
-.led {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: gray;
-    box-shadow: 0 0 8px rgba(0,0,0,0.5);
-    animation: pulseLED 2s infinite;
+    .card-footer{
+        font-size:10px;
+    }
 }
-
-@keyframes pulseLED {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.3); opacity: 1; }
-}
-
-/* Footer */
-footer {
-    margin-top: 14px;
-    font-size: 11px;
-    color: #555;
-}
-
-/* Audio caché */
-audio { display: none; }
 </style>
 </head>
 
 <body>
 
-<canvas id="bgCanvas"></canvas>
+<!-- BANNIERES -->
+<div class="banner top">
+    <span>🎶 Bienvenue sur RADIO 95 • Streaming en direct • 🎶</span>
+</div>
+<div class="banner bottom">
+    <span>🎶 Bienvenue sur RADIO 95 • Streaming en direct • 🎶</span>
+</div>
+
+<canvas id="particlesCanvas"></canvas>
 
 <div class="radio-card">
-    <div class="radio-title">
-        <div class="marquee">3H Radio...          Hoşgeldiniz...</div>
-    </div>
-    <div id="status">Pause</div>
+    <h2>RADIO 95 – En direct</h2>
 
-    <div class="visual">🎧</div>
-
-    <div class="controls">
-        <button id="playBtn" onclick="playRadio()">▶ Play
-            <span class="led" id="led"></span>
-        </button>
-        <button onclick="stopRadio()">⏹ Stop</button>
+    <div class="visual">
+        <img id="logo" src="https://radio3h.neocities.org/turkey-logo-black-and-white.png">
     </div>
 
-    <footer>Streaming powered by CuMaLi</footer>
+    <button id="playBtn">
+        PLAY <span class="led" id="led"></span>
+    </button>
 
-    <audio id="audio">
-        <source src="https://maradio.duckdns.org/stream" type="audio/mpeg">
-    </audio>
+    <!-- FOOTER CARD -->
+    <div class="card-footer">
+        Streaming design by <strong>CuMaLi</strong>
+    </div>
+
+    <audio id="audio" autoplay></audio>
 </div>
 
 <script>
-// 🔹 Lecteur radio + LED
+// ================= AUDIO =================
 const audio = document.getElementById("audio");
-const status = document.getElementById("status");
+audio.src = "https://maradio.duckdns.org/stream";
+
+const playBtn = document.getElementById("playBtn");
 const led = document.getElementById("led");
+const logo = document.getElementById("logo");
 
-function playRadio() {
-    audio.play();
-    status.textContent = "Lecture";
-    led.style.background = "limegreen";
+let audioCtx, analyser, dataArray;
+
+function initAudio(){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    const src = audioCtx.createMediaElementSource(audio);
+    src.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    analyser.fftSize = 128;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
-function stopRadio() {
-    audio.pause();
-    audio.currentTime = 0;
-    status.textContent = "Pause";
-    led.style.background = "gray";
-}
+playBtn.onclick = () => {
+    if(!audioCtx) initAudio();
+    audio.paused ? audio.play() : audio.pause();
+};
 
-// Synchronisation automatique
-audio.onpause = () => { status.textContent = "Pause"; led.style.background = "gray"; }
-audio.onplay = () => { status.textContent = "Lecture"; led.style.background = "limegreen"; }
+audio.onplay = () => led.classList.add("playing");
+audio.onpause = () => led.classList.remove("playing");
 
-// 🔹 Particules animées
-const canvas = document.getElementById("bgCanvas");
+// ================= PARTICULES =================
+const canvas = document.getElementById("particlesCanvas");
 const ctx = canvas.getContext("2d");
-let w = canvas.width = window.innerWidth;
-let h = canvas.height = window.innerHeight;
 
-window.addEventListener('resize', () => {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-});
-
-class Particle {
-    constructor() {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.size = Math.random() * 5 + 2;
-        this.speedX = (Math.random() - 0.5) * 1.5;
-        this.speedY = (Math.random() - 0.5) * 1.5;
-        this.alpha = Math.random() * 0.8 + 0.2;
-    }
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > w) this.x = 0;
-        if (this.x < 0) this.x = w;
-        if (this.y > h) this.y = 0;
-        if (this.y < 0) this.y = h;
-    }
-    draw() {
-        ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
-        ctx.shadowColor = 'white';
-        ctx.shadowBlur = 8;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-        ctx.fill();
-    }
+function resize(){
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
 }
+resize();
+addEventListener("resize", resize);
 
-const particlesArray = [];
-for (let i=0; i<150; i++) particlesArray.push(new Particle());
+const particles = [...Array(80)].map(() => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2 + 1,
+    dx: (Math.random() - .5) * .4,
+    dy: (Math.random() - .5) * .4
+}));
 
-function animate() {
-    ctx.clearRect(0,0,w,h);
-    particlesArray.forEach(p => { p.update(); p.draw(); });
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let avg = 0;
+
+    if(analyser && !audio.paused){
+        analyser.getByteFrequencyData(dataArray);
+        avg = dataArray.reduce((a,b)=>a+b,0)/dataArray.length;
+        logo.style.transform = `scale(${1+avg/260})`;
+    }
+
+    particles.forEach(p=>{
+        p.x += p.dx * (1 + avg/200);
+        p.y += p.dy * (1 + avg/200);
+        if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;
+        if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
+        ctx.fillStyle="rgba(255,255,255,.35)";
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r*(1+avg/160),0,Math.PI*2);
+        ctx.fill();
+    });
+
     requestAnimationFrame(animate);
 }
 animate();
+
+// ================= PWA =================
+if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js");
+}
 </script>
 
 </body>
