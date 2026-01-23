@@ -2,271 +2,109 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>RADIO 95 – Live</title>
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<link rel="apple-touch-icon" href="icon-192.png">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éditeur HTML Simple avec Son</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-
-/* ================= BODY ================= */
-body{
-    font-family:'Segoe UI',Arial,sans-serif;
-    height:100vh;
-    overflow:hidden;
-    color:#fff;
-    background:url("https://radio3h.neocities.org/turkey-logo-black-and-white.png") center/cover no-repeat;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #121212;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
 }
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:-2;
+.section {
+    display: flex;
+    flex-direction: column;
 }
-
-/* ================= BANNIERES ================= */
-.banner{
-    position:fixed;
-    left:0;
-    width:100%;
-    height:38px;
-    overflow:hidden;
-    background:rgba(0,0,0,.7);
-    backdrop-filter:blur(10px);
-    z-index:20;
+/* ÉDITEUR (plus petit) */
+.editor {
+    flex: 0 0 35%;
 }
-.banner.top{top:0}
-.banner.bottom{bottom:0}
-
-.banner span{
-    white-space:nowrap;
-    display:inline-block;
-    padding-left:100%;
-    animation:scroll 15s linear infinite;
-    line-height:38px;
-    font-size:14px;
-    letter-spacing:1px;
+/* RENDU (plus grand) */
+.preview {
+    flex: 0 0 65%;
 }
-@keyframes scroll{
-    from{transform:translateX(0)}
-    to{transform:translateX(-100%)}
+h2 {
+    margin: 6px 10px;
+    font-size: 14px;
 }
-
-/* ================= CANVAS ================= */
-#particlesCanvas{
-    position:fixed;
-    inset:0;
-    z-index:-1;
+/* textarea */
+textarea {
+    flex: 1;
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 12px;
+    font-size: 16px;
+    font-family: monospace;
+    background: #1e1e1e;
+    color: #fff;
 }
-
-/* ================= CARD ================= */
-.radio-card{
-    width:360px;
-    max-width:92%;
-    padding:22px;
-    border-radius:24px;
-    background:rgba(20,20,20,.18);
-    backdrop-filter:blur(20px);
-    border:1px solid rgba(255,255,255,.12);
-    text-align:center;
-    box-shadow:0 0 40px rgba(0,255,255,.25),0 0 25px rgba(255,0,255,.25);
+/* iframe */
+iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: white;
 }
-
-/* ================= VISUAL ================= */
-.visual{margin:16px 0}
-.visual img{
-    width:100px;
-    height:100px;
-    border-radius:50%;
-    transition:.1s;
-}
-
-/* ================= CONTROLS ================= */
-button{
-    margin-top:10px;
-    width:100%;
-    padding:10px;
-    border-radius:40px;
-    border:1px solid rgba(255,255,255,.2);
-    background:rgba(0,0,0,.65);
-    color:#fff;
-    font-size:14px;
-    letter-spacing:1px;
-    cursor:pointer;
-}
-button:hover{transform:scale(1.04)}
-
-.led{
-    width:9px;height:9px;
-    border-radius:50%;
-    background:gray;
-    display:inline-block;
-    margin-left:6px;
-}
-.led.playing{
-    background:#0f0;
-    box-shadow:0 0 6px #0f0;
-}
-
-/* ================= FOOTER ================= */
-.card-footer{
-    margin-top:14px;
-    font-size:11px;
-    letter-spacing:1px;
-    opacity:.75;
-}
-
-/* ================= MOBILE ================= */
-@media(max-width:600px){
-    body{
-        padding:38px 0;
-        align-items:center;
+/* PC : deux colonnes */
+@media (min-width: 769px) {
+    body {
+        flex-direction: row;
     }
-
-    .radio-card{
-        width:90%;
-        max-width:300px;
-        padding:14px;
-        border-radius:18px;
+    .editor, .preview {
+        flex: 1;
     }
-
-    .radio-card h2{
-        font-size:15px;
-    }
-
-    .visual img{
-        width:75px;
-        height:75px;
-    }
-
-    button{
-        font-size:13px;
-        padding:9px;
-    }
-
-    .card-footer{
-        font-size:10px;
+    h2 {
+        display: none;
     }
 }
 </style>
 </head>
-
 <body>
 
-<!-- BANNIERES -->
-<div class="banner top">
-    <span>🎶 Bienvenue sur RADIO 95 • Streaming en direct • 🎶</span>
+<!-- ÉDITEUR -->
+<div class="section editor">
+    <h2>HTML</h2>
+    <textarea id="htmlCode">
+<div style="padding:20px; background:#0074D9; color:white; border-radius:10px; text-align:center;">
+  ICI VOTRE HTML ! 👌
+  <br><br>
+  <audio autoplay>
+    <source src="" type="audio/mpeg">
+    Votre navigateur ne supporte pas l’audio HTML5.
+  </audio>
 </div>
-<div class="banner bottom">
-    <span>🎶 Bienvenue sur RADIO 95 • Streaming en direct • 🎶</span>
+    </textarea>
 </div>
 
-<canvas id="particlesCanvas"></canvas>
-
-<div class="radio-card">
-    <h2>RADIO 95 – En direct</h2>
-
-    <div class="visual">
-        <img id="logo" src="https://radio3h.neocities.org/turkey-logo-black-and-white.png">
-    </div>
-
-    <button id="playBtn">
-        PLAY <span class="led" id="led"></span>
-    </button>
-
-    <!-- FOOTER CARD -->
-    <div class="card-footer">
-        Streaming design by <strong>CuMaLi</strong>
-    </div>
-
-    <audio id="audio" autoplay></audio>
+<!-- RENDU -->
+<div class="section preview">
+    <h2>Rendu en temps réel</h2>
+    <iframe id="preview"></iframe>
 </div>
 
 <script>
-// ================= AUDIO =================
-const audio = document.getElementById("audio");
-audio.src = "https://maradio.duckdns.org/stream";
+const htmlCode = document.getElementById("htmlCode");
+const preview = document.getElementById("preview");
 
-const playBtn = document.getElementById("playBtn");
-const led = document.getElementById("led");
-const logo = document.getElementById("logo");
+function updatePreview() {
+    preview.srcdoc = htmlCode.value;
 
-let audioCtx, analyser, dataArray;
-
-function initAudio(){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    const src = audioCtx.createMediaElementSource(audio);
-    src.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    analyser.fftSize = 128;
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-}
-
-playBtn.onclick = () => {
-    if(!audioCtx) initAudio();
-    audio.paused ? audio.play() : audio.pause();
-};
-
-audio.onplay = () => led.classList.add("playing");
-audio.onpause = () => led.classList.remove("playing");
-
-// ================= PARTICULES =================
-const canvas = document.getElementById("particlesCanvas");
-const ctx = canvas.getContext("2d");
-
-function resize(){
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-}
-resize();
-addEventListener("resize", resize);
-
-const particles = [...Array(80)].map(() => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 2 + 1,
-    dx: (Math.random() - .5) * .4,
-    dy: (Math.random() - .5) * .4
-}));
-
-function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let avg = 0;
-
-    if(analyser && !audio.paused){
-        analyser.getByteFrequencyData(dataArray);
-        avg = dataArray.reduce((a,b)=>a+b,0)/dataArray.length;
-        logo.style.transform = `scale(${1+avg/260})`;
+    // Essayer de lancer le son si l'autoplay est bloqué
+    const tryAudio = preview.contentDocument.querySelector('audio');
+    if(tryAudio){
+        tryAudio.volume = 0.8;
+        tryAudio.play().catch(()=>console.log('Autoplay bloqué, clic requis'));
     }
-
-    particles.forEach(p=>{
-        p.x += p.dx * (1 + avg/200);
-        p.y += p.dy * (1 + avg/200);
-        if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;
-        if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
-        ctx.fillStyle="rgba(255,255,255,.35)";
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,p.r*(1+avg/160),0,Math.PI*2);
-        ctx.fill();
-    });
-
-    requestAnimationFrame(animate);
 }
-animate();
 
-// ================= PWA =================
-if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("sw.js");
-}
+htmlCode.addEventListener("input", updatePreview);
+updatePreview();
 </script>
 
 </body>
